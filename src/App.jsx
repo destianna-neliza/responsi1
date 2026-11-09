@@ -3,43 +3,55 @@ import $ from "jquery";
 
 import Sidebar from "./components/Sidebar.jsx";
 import Navbar from "./components/Navbar.jsx";
-import ProductTable from "./components/ProductTable.jsx";
-import ProductForm from "./components/ProductForm.jsx";
+import PatientTable from "./components/PatientTable.jsx";
+import PatientForm from "./components/PatientForm.jsx";
 
 function App() {
-  // Data awal produk
-  const [products, setProducts] = useState([
+  // Data awal pasien
+  const [patients, setPatients] = useState([
     {
       id: 1,
-      name: "Tas Wanita",
-      category: "Fashion",
-      price: 150000,
-      stock: 20,
-      discount: 10,
+      medicalRecord: "RM001",
+      patientName: "Andi Saputra",
+      gender: "Laki-laki",
+      age: 25,
+      clinic: "Poli Umum",
+      doctor: "dr. Budi",
+      visitDate: "2026-11-10",
+      status: "Selesai",
     },
     {
       id: 2,
-      name: "Sepatu Sneakers",
-      category: "Sepatu",
-      price: 250000,
-      stock: 15,
-      discount: 5,
+      medicalRecord: "RM002",
+      patientName: "Siti Amelia",
+      gender: "Perempuan",
+      age: 30,
+      clinic: "Poli Gigi",
+      doctor: "drg. Rina",
+      visitDate: "2026-11-10",
+      status: "Dalam Penanganan",
     },
     {
       id: 3,
-      name: "Jam Tangan",
-      category: "Aksesoris",
-      price: 180000,
-      stock: 8,
-      discount: 15,
+      medicalRecord: "RM003",
+      patientName: "Budi Santoso",
+      gender: "Laki-laki",
+      age: 42,
+      clinic: "Poli Penyakit Dalam",
+      doctor: "dr. Ahmad",
+      visitDate: "2026-11-10",
+      status: "Menunggu",
     },
     {
       id: 4,
-      name: "Baju Wanita",
-      category: "Fashion",
-      price: 100000,
-      stock: 30,
-      discount: 0,
+      medicalRecord: "RM004",
+      patientName: "Destianna Neliza",
+      gender: "Perempuan",
+      age: 20,
+      clinic: "Poli Umum",
+      doctor: "dr. Budi",
+      visitDate: "2026-11-10",
+      status: "Menunggu",
     },
   ]);
 
@@ -48,125 +60,128 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const [form, setForm] = useState({
-    name: "",
-    category: "",
-    price: "",
-    stock: "",
-    discount: "",
-  });
+  const initialForm = {
+    medicalRecord: "",
+    patientName: "",
+    gender: "",
+    age: "",
+    clinic: "",
+    doctor: "",
+    visitDate: "",
+    status: "",
+  };
+
+  const [form, setForm] = useState(initialForm);
 
   // Efek jQuery
   useEffect(() => {
     $(".welcome-note").hide().fadeIn(1000);
   }, []);
 
-  // Menghitung ringkasan produk
-  const totalProducts = products.length;
+  // Menghitung ringkasan pasien
+  const totalPatients = patients.length;
 
-  const totalStock = products.reduce(
-    (total, product) => total + Number(product.stock),
-    0,
-  );
+  const today = new Date().toLocaleDateString("en-CA");
 
-  const lowStock = products.filter((product) => product.stock <= 10).length;
+  const todayVisits = patients.filter(
+    (patient) => patient.visitDate === today,
+  ).length;
 
-  const totalValue = products.reduce(
-    (total, product) => total + Number(product.price) * Number(product.stock),
-    0,
-  );
+  const beingHandled = patients.filter(
+    (patient) => patient.status === "Dalam Penanganan",
+  ).length;
 
-  // Format harga menjadi rupiah
-  const formatRupiah = (number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(number);
-  };
+  const completed = patients.filter(
+    (patient) => patient.status === "Selesai",
+  ).length;
 
-  // Membuka form tambah produk
+  // Membuka form tambah pasien
   const handleAdd = () => {
     setEditId(null);
-
-    setForm({
-      name: "",
-      category: "",
-      price: "",
-      stock: "",
-      discount: "",
-    });
-
+    setForm({ ...initialForm });
     setShowForm(true);
   };
 
-  // Menyimpan data produk
+  // Menyimpan data pasien
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (
-      Number(form.price) < 0 ||
-      Number(form.stock) < 0 ||
-      Number(form.discount) < 0 ||
-      Number(form.discount) > 100
-    ) {
-      alert("Periksa harga, stok, dan diskon!");
+    if (Number(form.age) < 0) {
+      alert("Umur tidak boleh negatif!");
       return;
     }
 
-    const newProduct = {
-      id: editId || Date.now(),
-      name: form.name.trim(),
-      category: form.category.trim(),
-      price: Number(form.price),
-      stock: Number(form.stock),
-      discount: Number(form.discount),
+    const duplicateRM = patients.some(
+      (patient) =>
+        patient.medicalRecord.toLowerCase() ===
+          form.medicalRecord.trim().toLowerCase() && patient.id !== editId,
+    );
+
+    if (duplicateRM) {
+      alert("Nomor rekam medis sudah digunakan!");
+      return;
+    }
+
+    const newPatient = {
+      id: editId !== null ? editId : Date.now(),
+      medicalRecord: form.medicalRecord.trim(),
+      patientName: form.patientName.trim(),
+      gender: form.gender,
+      age: Number(form.age),
+      clinic: form.clinic,
+      doctor: form.doctor.trim(),
+      visitDate: form.visitDate,
+      status: form.status,
     };
 
     if (editId !== null) {
       // UPDATE
-      setProducts(
-        products.map((product) =>
-          product.id === editId ? newProduct : product,
+      setPatients(
+        patients.map((patient) =>
+          patient.id === editId ? newPatient : patient,
         ),
       );
 
-      alert("Produk berhasil diperbarui!");
+      alert("Data pasien berhasil diperbarui!");
     } else {
       // CREATE
-      setProducts([...products, newProduct]);
+      setPatients([...patients, newPatient]);
 
-      alert("Produk berhasil ditambahkan!");
+      alert("Data pasien berhasil ditambahkan!");
     }
 
     setShowForm(false);
+    setForm({ ...initialForm });
   };
 
-  // Membuka form edit
-  const handleEdit = (product) => {
-    setEditId(product.id);
+  // Membuka form edit pasien
+  const handleEdit = (patient) => {
+    setEditId(patient.id);
 
     setForm({
-      name: product.name,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-      discount: product.discount,
+      medicalRecord: patient.medicalRecord,
+      patientName: patient.patientName,
+      gender: patient.gender,
+      age: patient.age,
+      clinic: patient.clinic,
+      doctor: patient.doctor,
+      visitDate: patient.visitDate,
+      status: patient.status,
     });
 
     setShowForm(true);
   };
 
-  // Menghapus produk
+  // Menghapus pasien
   const handleDelete = (id) => {
     const confirmDelete = window.confirm(
-      "Apakah kamu yakin ingin menghapus produk ini?",
+      "Apakah kamu yakin ingin menghapus data pasien ini?",
     );
 
     if (confirmDelete) {
-      setProducts(products.filter((product) => product.id !== id));
+      setPatients(patients.filter((patient) => patient.id !== id));
 
-      alert("Produk berhasil dihapus!");
+      alert("Data pasien berhasil dihapus!");
     }
   };
 
@@ -179,57 +194,57 @@ function App() {
 
         {/* Sambutan */}
         <section id="dashboard" className="welcome-note">
-          <h2>Selamat Datang di PinkShop! 💗</h2>
+          <h2>Selamat Datang di MedCare! 🏥</h2>
           <p>
-            Kelola produk toko online kamu dengan mudah melalui dashboard ini.
+            Kelola data pasien dan rekam medis klinik dengan mudah melalui
+            dashboard ini.
           </p>
         </section>
 
         {/* Ringkasan */}
         <section id="ringkasan" className="summary-section">
           <div className="summary-card">
-            <div className="summary-icon">🛍️</div>
-            <p>Total Produk</p>
-            <h3>{totalProducts}</h3>
-            <small>Produk terdaftar</small>
+            <div className="summary-icon">👥</div>
+            <p>Total Pasien</p>
+            <h3>{totalPatients}</h3>
+            <small>Pasien terdaftar</small>
           </div>
 
           <div className="summary-card">
-            <div className="summary-icon">📦</div>
-            <p>Total Stok</p>
-            <h3>{totalStock}</h3>
-            <small>Unit tersedia</small>
+            <div className="summary-icon">📅</div>
+            <p>Kunjungan Hari Ini</p>
+            <h3>{todayVisits}</h3>
+            <small>Jumlah kunjungan</small>
           </div>
 
           <div className="summary-card">
-            <div className="summary-icon">⚠️</div>
-            <p>Stok Menipis</p>
-            <h3>{lowStock}</h3>
-            <small>Produk stok ≤ 10</small>
+            <div className="summary-icon">🩺</div>
+            <p>Sedang Ditangani</p>
+            <h3>{beingHandled}</h3>
+            <small>Pasien dalam penanganan</small>
           </div>
 
           <div className="summary-card">
-            <div className="summary-icon">💰</div>
-            <p>Nilai Persediaan</p>
-            <h3 className="value-text">{formatRupiah(totalValue)}</h3>
-            <small>Total harga × stok</small>
+            <div className="summary-icon">📋</div>
+            <p>Penanganan Selesai</p>
+            <h3>{completed}</h3>
+            <small>Pasien selesai ditangani</small>
           </div>
         </section>
 
-        {/* Tabel produk */}
-        <ProductTable
-          products={products}
+        {/* Tabel pasien */}
+        <PatientTable
+          patients={patients}
           search={search}
           setSearch={setSearch}
           onAdd={handleAdd}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          formatRupiah={formatRupiah}
         />
 
-        {/* Form tambah/edit */}
+        {/* Form tambah/edit pasien */}
         {showForm && (
-          <ProductForm
+          <PatientForm
             form={form}
             setForm={setForm}
             editId={editId}
@@ -239,7 +254,7 @@ function App() {
         )}
 
         <footer>
-          <p>© 2026 PinkShop. Dashboard Manajemen Produk.</p>
+          <p>© 2026 MedCare. Dashboard Rekam Medis Pasien.</p>
         </footer>
       </main>
     </div>

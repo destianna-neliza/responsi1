@@ -2,7 +2,7 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <h3 className="brand">
-        Pink<span>Shop.</span>
+        Med<span>Care.</span>
       </h3>
 
       <p className="menu-label">MENU UTAMA</p>
@@ -11,8 +11,8 @@ function Sidebar() {
         <span>▦</span> Dashboard
       </a>
 
-      <a href="#produk" className="menu-item">
-        <span>🛍️</span> Data Produk
+      <a href="#pasien" className="menu-item">
+        <span>👥</span> Data Pasien
       </a>
 
       <a href="#ringkasan" className="menu-item">
@@ -22,7 +22,7 @@ function Sidebar() {
       <div className="sidebar-footer">
         <div className="avatar">A</div>
         <div>
-          <strong>Admin Toko</strong>
+          <strong>Admin Klinik</strong>
           <small>Administrator</small>
         </div>
       </div>
