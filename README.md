@@ -57,7 +57,7 @@ npm run dev
 
 Setelah berhasil dijalankan, buka alamat yang muncul pada terminal, yaitu:
 
-http://localhost:5173/
+
 
 5. Hasil Akhir Dashboard Rekam Medis Pasien
 
